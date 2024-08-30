@@ -11,6 +11,34 @@ class Matrix:
             self.rows = len(data)
             self.cols = len(data[0])
 
+    def strassen_multiply(self, other):
+        # Check if matrices have compatible dimensions for Strassen's algorithm
+        if self.rows != other.rows or self.cols != other.cols or self.rows != self.cols or self.rows % 2 != 0:
+            raise ValueError("Matrices must be square and have dimensions that are a power of 2 for Strassen's algorithm.")
+
+        THRESHOLD = (128,128)
+        if self.rows <= THRESHOLD:
+            return self._naive_multiply(other)
+            return self._naive_multiply(other)
+
+        a11, a12, a21, a22 = self.divide_submatrices()
+        b11, b12, b21, b22 = other.divide_submatrices()
+
+        m1 = (a11 + a22) * (b11 + b22)
+        m2 = (a21 + a22) * b11
+        m3 = a11 * (b12 - b22)
+        m4 = a21 * (b11 - b12)
+        m5 = (a11 + a12) * b22
+        m6 = (a21 + a22) * b21
+        m7 = (a11 + a12) * (b11 + b12)
+
+        c11 = m1 + m4 - m5 + m7
+        c12 = m3 + m5
+        c21 = m2 + m4
+        c22 = m1 + m3 - m2 + m6
+
+        return self.combine_submatrices(c11, c12, c21, c22)
+
     def __repr__(self):
         return '\n'.join(['\n'.join([' '.join(map(str, row)) for row in batch]) for batch in self.data])
 
