@@ -15,8 +15,6 @@ We are excited that you are interested in contributing to MetaForm! Your contrib
 - [Style Guide](#style-guide)
 - [License](#license)
 
-
-
 ## How Can I Contribute?
 
 ### Reporting Bugs
@@ -32,7 +30,7 @@ We welcome suggestions for new features or improvements to existing features. To
 We welcome contributions in the form of code! If you would like to contribute code to MetaForm, please follow these steps:
 
 1. **Fork the repository**: Click the "Fork" button at the top right corner of the [repository page](https://github.com/torinriley/metaform).
-2. **Create a new branch**: Create a branch for your feature or bugfix (`git checkout -b feature-branch`).
+2. **Create a new branch**: Create a branch for your feature or bugfix (`git checkout -b feature-branch`). Please ensure that you are working on a branch that is specifically created for your new feature or fix, and avoid working directly on the `main` branch.
 3. **Make your changes**: Implement your feature or bugfix.
 4. **Write tests**: Ensure your code is well-tested.
 5. **Commit your changes**: Use descriptive commit messages (`git commit -m 'Add new feature'`).
@@ -63,14 +61,15 @@ Documentation is key to the success of any open-source project. If you find area
     pytest
     ```
     Ensure that all tests pass before making your changes.
-     ### NOTE - Tests are still under development, comding soon ###
+    
+    **NOTE**: Tests are still under development and will be coming soon.
 
 ### Workflow
 
-1. **Work on your branch**: Develop your feature or fix in a separate branch.
+1. **Work on your branch**: Develop your feature or fix in a separate branch created specifically for that purpose.
 2. **Keep your branch up to date**: Periodically rebase your branch against the `main` branch to stay up to date.
 3. **Write meaningful commit messages**: Commit messages should be clear and descriptive.
-4. **Submit a pull request**: Once you are satisfied with your changes, open a pull request. 
+4. **Submit a pull request**: Once you are satisfied with your changes, open a pull request.
 
 ## Style Guide
 
