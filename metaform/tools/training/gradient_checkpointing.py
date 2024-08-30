@@ -1,4 +1,3 @@
-# tools/training/gradient_checkpointing.py
 
 class GradientCheckpointing:
     def __init__(self, model):
@@ -38,7 +37,7 @@ class GradientCheckpointing:
         def backward(*grad_outputs):
             # Recompute the forward pass during the backward pass
             recomputed_output = function(*inputs)
-            grads = recomputed_output.backward(*grad_outputs)  # Custom backward pass
+            grads = recomputed_output.backward(*grad_outputs)  
             return grads
 
         return output, backward

@@ -1,12 +1,15 @@
-from .transformer_block import TransformerBlock
+from .multihead_attention import MultiHeadAttention
+from .feedforward import FeedForward
+from .normalization import LayerNormalization
 from ...tools.matrix import Matrix
+from ...tools.training.gradient_checkpointing import GradientCheckpointing
 
-class TransformerModel:
+class TransformerBlock:
     """
-    TransformerModel is a deep neural network model based on the Transformer architecture.
+    TransformerBlock is a single block within a Transformer model.
 
-    This model consists of multiple stacked Transformer blocks. The number of blocks
-    (layers) can be customized by changing the `num_layers` parameter during initialization.
+    It consists of a multi-head self-attention layer followed by a feedforward layer,
+    each with layer normalization and optional dropout.
 
     Parameters:
     -----------
@@ -16,25 +19,15 @@ class TransformerModel:
         The number of attention heads in the multi-head attention mechanism.
     ff_hidden_size : int
         The number of hidden units in the feedforward network.
-    num_layers : int, optional
-        The number of Transformer blocks to stack in the model (default is 80).
     dropout : float, optional
         Dropout rate applied after attention and feedforward layers (default is 0.1).
-    use_positional_encoding : bool, optional
-        Whether to include positional encoding (default is True).
     checkpointing : bool, optional
-        Whether to use gradient checkpointing to save memory (default is False).
-
-    Methods:
-    --------
-    forward(x):
-        Performs the forward pass through the entire Transformer model.
+        Whether to use gradient checkpointing for the block (default is False).
     """
 
-    def __init__(self, embed_size, num_heads, ff_hidden_size, num_layers=80, dropout=0.1, 
-                 use_positional_encoding=True, checkpointing=False):
+    def __init__(self, embed_size, num_heads, ff_hidden_size, dropout=0.1, checkpointing=False):
         """
-        Initializes the TransformerModel with the specified number of layers.
+        Initializes the TransformerBlock.
 
         Parameters:
         -----------
@@ -44,63 +37,48 @@ class TransformerModel:
             The number of attention heads in the multi-head attention mechanism.
         ff_hidden_size : int
             The number of hidden units in the feedforward network.
-        num_layers : int, optional
-            The number of Transformer blocks to stack in the model (default is 80).
         dropout : float, optional
             Dropout rate applied after attention and feedforward layers (default is 0.1).
-        use_positional_encoding : bool, optional
-            Whether to include positional encoding (default is True).
         checkpointing : bool, optional
-            Whether to use gradient checkpointing to save memory (default is False).
+            Whether to use gradient checkpointing for the block (default is False).
         """
-        self.layers = [TransformerBlock(embed_size, num_heads, ff_hidden_size, dropout) for _ in range(num_layers)]
-        self.use_positional_encoding = use_positional_encoding
+        self.attention = MultiHeadAttention(embed_size, num_heads)
+        self.norm1 = LayerNormalization()
+        self.norm2 = LayerNormalization()
+        self.feed_forward = FeedForward(embed_size, ff_hidden_size, dropout)
         self.checkpointing = checkpointing
 
-    def forward(self, x, positional_encoding=None):
+        if self.checkpointing:
+            self.checkpointer = GradientCheckpointing(self)
+
+    def forward(self, x):
         """
-        Performs the forward pass through the entire Transformer model.
+        Performs the forward pass through the Transformer block.
 
         Parameters:
         -----------
         x : Matrix
             The input matrix representing the embedded input sequence.
-        positional_encoding : Matrix, optional
-            The positional encoding to be added to the input sequence.
 
         Returns:
         --------
         out : Matrix
-            The output matrix after passing through all Transformer blocks.
+            The output matrix after passing through the Transformer block.
         """
-        if self.use_positional_encoding and positional_encoding is not None:
-            x = x + positional_encoding  # Add positional encoding if required
+        # Multi-Head Self-Attention and Residual Connection
+        if self.checkpointing:
+            attention, _ = self.checkpointer.checkpoint(self.attention.forward, x, x, x)
+        else:
+            attention = self.attention.forward(x, x, x)
 
-        for layer in self.layers:
-            if self.checkpointing:
-                x = self.checkpoint_layer(layer, x)  # Use gradient checkpointing
-            else:
-                x = layer.forward(x)  # Pass through each Transformer block
+        x = self.norm1.forward(x + attention)
 
-        return x  # Final output after all layers
+        # Feedforward Network and Residual Connection
+        if self.checkpointing:
+            feedforward, _ = self.checkpointer.checkpoint(self.feed_forward.forward, x)
+        else:
+            feedforward = self.feed_forward.forward(x)
 
-    def checkpoint_layer(self, layer, x):
-        """
-        Applies gradient checkpointing for memory efficiency.
+        out = self.norm2.forward(x + feedforward)
 
-        Parameters:
-        -----------
-        layer : TransformerBlock
-            The Transformer block to apply checkpointing to.
-        x : Matrix
-            The input matrix to the layer.
-
-        Returns:
-        --------
-        out : Matrix
-            The output matrix after the forward pass with checkpointing.
-        """
-        # Here, you would implement the logic for gradient checkpointing
-        # This is typically done by recomputing the forward pass during the backward pass.
-        # For now, we'll simulate it by just calling the forward pass.
-        return layer.forward(x)
+        return out
