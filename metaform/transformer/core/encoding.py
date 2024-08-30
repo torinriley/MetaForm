@@ -41,7 +41,7 @@ def get_positional_encoding(seq_len: int, d_model: int, batch_size: Optional[int
     else:
         raise ValueError("Invalid mode. Choose from 'sin_cos', 'linear', or 'random'.")
 
-    # Generate positional encodings
+    # generate positional encodings
     positional_encoding = Matrix([encoding_func(pos, d_model) for pos in range(seq_len)])
 
     if batch_size:

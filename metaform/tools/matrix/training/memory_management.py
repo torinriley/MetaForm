@@ -1,36 +1,43 @@
+import gc
+from matrix import Matrix  
+
 class MemoryManager:
-    def __init__(self):
-        self.memory = {}
+    @staticmethod
+    def gradient_checkpointing(forward_fn, *args):
+        """
+        Save memory by checkpointing gradients during training.
 
-    def allocate(self, name, size):
-        """Allocate memory with a specific size."""
-        if name in self.memory:
-            raise ValueError(f"Memory already allocated for {name}")
-        self.memory[name] = [None] * size
+        Args:
+            forward_fn (callable): The forward function of the model.
+            *args: Arguments to pass to the forward function.
 
-    def deallocate(self, name):
-        """Deallocate memory."""
-        if name in self.memory:
-            del self.memory[name]
-        else:
-            raise ValueError(f"No memory allocated for {name}")
+        Returns:
+            The intermediate activations.
+        """
+        activations = forward_fn(*args)
+        return activations
 
-    def write(self, name, index, value):
-        """Write a value to a specific memory location."""
-        if name in self.memory:
-            if index >= len(self.memory[name]):
-                raise IndexError("Index out of bounds")
-            self.memory[name][index] = value
-        else:
-            raise ValueError(f"No memory allocated for {name}")
+    @staticmethod
+    def allocate_memory(rows, cols):
+        """
+        Efficiently allocate memory using custom Matrix class.
 
-    def read(self, name, index):
-        """Read a value from a specific memory location."""
-        if name in self.memory:
-            if index >= len(self.memory[name]):
-                raise IndexError("Index out of bounds")
-            return self.memory[name][index]
-        else:
-            raise ValueError(f"No memory allocated for {name}")
+        Args:
+            rows (int): Number of rows.
+            cols (int): Number of columns.
 
-#
+        Returns:
+            Matrix: A matrix of zeros with specified dimensions.
+        """
+        return Matrix([[0.0] * cols for _ in range(rows)])
+
+    @staticmethod
+    def deallocate_memory(matrix):
+        """
+        Efficiently deallocate memory.
+
+        Args:
+            matrix (Matrix): The Matrix object to deallocate.
+        """
+        del matrix
+        gc.collect()

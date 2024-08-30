@@ -17,7 +17,7 @@ def apply_mask(attention_scores, mask):
 
 
 def memory_efficient_attention(Q, K, V, mask=None):
-    # instead of computing the entire attention matrix at once, do it in chunks to save memory
+    # compute attention matrix in chunks
     attention_chunks = []
     for i in range(Q.cols):  # process by columns or rows in chunks
         q_chunk = Q[:, i:i+1]
@@ -28,7 +28,7 @@ def memory_efficient_attention(Q, K, V, mask=None):
         context_chunk = attention_weights * V  # multiply by value matrix
         attention_chunks.append(context_chunk)
 
-    # Concatenate chunks to form the final attention matrix
+    # concatenate chunks to form the final attention matrix
     return MatrixUtils.concatenate(*attention_chunks, axis=1)
 
 def softmax(matrix):
