@@ -29,19 +29,3 @@ class IPC:
         # Wait for acknowledgment (or synchronization from other processes)
         return self.receive()
 
-# Example usage for distributed training
-def worker(ipc):
-    # Example: Worker sending and receiving model parameters
-    ipc.send("Model parameters")
-    print("Received:", ipc.receive())
-
-if __name__ == "__main__":
-    ipc = IPC()
-    p1 = Process(target=worker, args=(ipc,))
-    p2 = Process(target=worker, args=(ipc,))
-
-    p1.start()
-    p2.start()
-
-    p1.join()
-    p2.join()
