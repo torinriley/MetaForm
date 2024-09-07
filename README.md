@@ -8,6 +8,7 @@
 - [Quick Start](#quick-start)
 - [Modules](#modules)
   - [Core Components](#core-components)
+  - [Matrix Module](#matrix-module)
   - [Layers](#layers)
   - [Tools](#tools)
   - [Training Utilities](#training-utilities)
@@ -69,6 +70,78 @@ This flowchart provides a detailed visualization of the MetaForm Transformer Mod
 ## Core Components
 - **TransformerModel**: The main transformer model class, allowing for the creation of custom transformer architectures with a flexible number of layers and attention heads.
 - **GradientCheckpointing**: Utility for memory-efficient training through gradient checkpointing.
+## Overview
+
+This matrix module was designed and built from scratch, providing a wide range of functionalities for matrix operations, including core matrix operations, algebraic manipulation, statistical analysis, and utility functions. The module is broken down into multiple components that interact seamlessly to allow flexible matrix computation, manipulation, and analysis.
+
+## Matrix Moduel
+
+### 1. **Core Matrix Class (`Matrix`)**
+
+The `Matrix` class serves as the foundation of the module. It handles the creation and basic operations for matrices, including addition, subtraction, and multiplication, as well as element-wise operations.
+
+#### Key Features:
+- **Initialization**: Initialize matrices with lists of lists.
+- **Matrix Operations**: Supports matrix addition, subtraction, multiplication, and transpose.
+- **Dimension Handling**: Automatically handles row and column operations, ensuring the integrity of matrix dimensions.
+
+### 2. **Matrix Algebra (`MatrixAlgebra`)**
+
+The `MatrixAlgebra` class provides algebraic operations such as calculating the determinant, finding the inverse of matrices, and computing matrix minors.
+
+#### Key Features:
+- **Determinant Calculation**: Computes the determinant for matrices recursively.
+- **Inverse Calculation**: Handles matrix inversion, including edge cases like 2x2 matrices.
+- **Minor and Cofactor**: Provides the ability to calculate the minor of a matrix and use it for more complex algebraic operations.
+
+### 3. **Random Matrix Generation (`MatrixRandom`)**
+
+The `MatrixRandom` class generates random matrices with specified dimensions and range for the elements.
+
+#### Key Features:
+- **Random Matrix Generation**: Create matrices filled with random integers within a specified range.
+- **Flexible Dimensions**: Supports generation for matrices of any size.
+
+### 4. **Matrix Statistics (`MatrixStatistics`)**
+
+The `MatrixStatistics` class offers basic statistical analysis on matrices, including mean, variance, and standard deviation calculations.
+
+#### Key Features:
+- **Mean**: Computes the mean value of all elements in the matrix.
+- **Variance**: Calculates the variance of the matrix values.
+- **Standard Deviation**: Provides the standard deviation based on matrix elements.
+
+### 5. **Matrix Utilities (`MatrixUtils`)**
+
+The `MatrixUtils` class includes utility functions to reshape, slice, and concatenate matrices.
+
+#### Key Features:
+- **Reshape**: Allows for matrix reshaping, as long as the dimensions match the total number of elements.
+- **Slicing**: Enables extracting submatrices from larger matrices.
+- **Concatenation**: Supports vertical and horizontal concatenation of matrices.
+
+## Example Usage
+
+```python
+from matrix import Matrix
+from algebra import MatrixAlgebra
+from random import MatrixRandom
+from statistics import MatrixStatistics
+from utils import MatrixUtils
+
+# Create a random 3x3 matrix
+matrix = MatrixRandom.randint(3, 3, low=0, high=10)
+
+# Calculate its determinant
+det = MatrixAlgebra.determinant(matrix)
+
+# Get mean and variance of the matrix
+mean = MatrixStatistics.mean(matrix)
+variance = MatrixStatistics.variance(matrix)
+
+# Reshape the matrix into a 1x9 matrix
+reshaped_matrix = MatrixUtils.reshape(matrix, 1, 9)
+```
 
 ## Layers
 - **MultiHeadAttention**: Implements the multi-head self-attention mechanism.
