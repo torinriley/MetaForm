@@ -62,6 +62,10 @@ print("Output shape:", output.shape())
 
 # Modules
 
+This flowchart provides a detailed visualization of the MetaForm Transformer Model, specifically designed as a Large Language Model (LLM) for sequence generation tasks. It outlines the core components, from input preprocessing and positional encoding to the stacked transformer blocks and the intricate multi-head attention mechanism. The flow also includes critical decision points such as gradient checkpointing for memory optimization and the End-of-Sequence (EOS) token generation, which determines when the model completes generating text. The diagram showcases the decoder and softmax layers for token prediction, leading to the final sequence output. This flowchart serves as a clear representation of the entire data flow through the MetaForm LLM, offering insights into its architecture and sequence generation process.
+<img width="4064" alt="MetaForm" src="https://github.com/user-attachments/assets/43512fbc-01f1-462d-ba24-37759f4f93bc">
+
+
 ## Core Components
 - **TransformerModel**: The main transformer model class, allowing for the creation of custom transformer architectures with a flexible number of layers and attention heads.
 - **GradientCheckpointing**: Utility for memory-efficient training through gradient checkpointing.
@@ -70,6 +74,101 @@ print("Output shape:", output.shape())
 - **MultiHeadAttention**: Implements the multi-head self-attention mechanism.
 - **FeedForward**: A fully connected feedforward network layer.
 - **Normalization**: Layer normalization to stabilize training.
+
+### Layers Overview
+
+In the **MetaForm LLM** model, several layers are used to process the input data and transform it into meaningful output. This includes the **Multi-Head Attention** mechanism, **Feedforward Neural Networks**, and **Layer Normalization**, among other key components. Below is a mathematical breakdown of how these layers function.
+
+#### Multi-Head Attention
+
+Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. For each head, the attention mechanism computes **scaled dot-product attention** using the following equation:
+
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+
+Where:
+\( Q \) (queries), \( K \) (keys), and \( V \) (values) are linear projections of the input embeddings.
+\( d_k \) is the dimensionality of the keys.
+\( \text{softmax} \) is applied to normalize the attention scores.
+
+In **multi-head attention**, multiple sets of \( Q \), \( K \), and \( V \) matrices are learned, and each head computes its own attention output. These are then concatenated and linearly transformed:
+
+$$
+\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \text{head}_2, \dots, \text{head}_h) W_O
+$$
+
+Where:
+\( W_O \) is the output projection matrix.
+\( h \) is the number of attention heads.
+
+Each attention head is calculated as:
+
+$$
+{head}i = \text{Attention}(QW_{q,i}, KW_{k,i}, VW_{v,i})
+$$
+
+Where:
+
+$$
+W_{q,i}, W_{k,i}, W_{v,i}
+$$
+
+are learned projection matrices for queries, keys, and values for each head.
+
+---
+
+#### Feedforward Network
+
+After the multi-head attention mechanism, the output is passed through a **Feedforward Neural Network (FFN)**. Each position in the sequence is processed independently by the FFN. The FFN consists of two linear transformations with a ReLU activation in between:
+
+$$
+\text{FFN}(x) = \text{ReLU}(x W_1 + b_1) W_2 + b_2
+$$
+
+Where:
+- \( W_1 \) and \( W_2 \) are weight matrices.
+- \( b_1 \) and \( b_2 \) are bias terms.
+- \( \text{ReLU}(x) = \max(0, x) \) is the Rectified Linear Unit activation function.
+
+The FFN is applied to each position in the sequence separately but with the same parameters, making it position-wise feedforward.
+
+---
+
+#### Layer Normalization
+
+Layer normalization is applied after the multi-head attention and feedforward networks to stabilize and speed up training. The layer normalization is computed as:
+
+$$
+\text{LayerNorm}(x) = \frac{x - \mu}{\sigma + \epsilon} \cdot \gamma + \beta
+$$
+
+Where:
+- \( \mu \) and \( \sigma \) are the mean and standard deviation of the activations.
+- \( \epsilon \) is a small constant for numerical stability.
+- \( \gamma \) and \( \beta \) are learned scale and shift parameters.
+
+---
+
+### Combining Layers
+
+Each transformer block consists of **multi-head attention** followed by a **feedforward network**, with **residual connections** and **layer normalization** applied after both sub-layers:
+
+Multi-head Attention:
+
+$$
+\( x = \text{LayerNorm}(x + \text{MultiHead}(Q, K, V)) \)
+$$
+
+Feedforward Network: 
+
+$$
+\( x = \text{LayerNorm}(x + \text{FFN}(x)) \)
+$$
+
+This architecture allows the transformer to capture complex dependencies between tokens in the sequence, facilitating effective sequence modeling for language tasks.
+
+---
 
 ## Tools
 - **Matrix Operations**: Custom matrix operations designed to replace numpy for matrix manipulation, supporting core linear algebra operations.
