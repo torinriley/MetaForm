@@ -6,7 +6,7 @@ class MultiHeadSelfAttention:
         self.num_heads = num_heads
         self.depth = d_model // num_heads
 
-        self.Wq = Matrix.random(d_model, d_model)  # Replace with appropriate random initialization from your matrix lib
+        self.Wq = Matrix.random(d_model, d_model) 
         self.Wk = Matrix.random(d_model, d_model)
         self.Wv = Matrix.random(d_model, d_model)
         self.Wo = Matrix.random(d_model, d_model)
